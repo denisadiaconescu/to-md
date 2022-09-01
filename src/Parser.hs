@@ -4,6 +4,7 @@ import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Debug.Trace
+import qualified Text.Megaparsec.Char.Lexer as L
 
 newtype ToMd = ToMd
   { inputFile :: String
@@ -14,31 +15,19 @@ type Parser = Parsec Void String
 
 parser :: Parser ToMd
 parser = do
-  traceM "start"
   ignoreComments
   string "from ["
   file <- many (noneOf [']'])
   char ']'
-  many space
-  --ignoreComments
+  ignoreComments
   string "make md"
-  many space
-  --ignoreComments
+  ignoreComments
   pure $ ToMd {inputFile = file}
 
-ignoreComments :: Parser ()
-ignoreComments = do
-  traceM "before many spaces"
-  many space
-  traceM "after many spaces"
-  commentLine
-  many space
-  traceM "after a comment line"
-  pure ()
 
-commentLine :: Parser ()
-commentLine = do
-  char '#'
-  many (noneOf ['\n', '\r'])
-  pure ()
-  --ignoreComments
+ignoreComments :: Parser ()
+ignoreComments = L.space 
+    space1
+    (L.skipLineComment "#")
+    empty
+
