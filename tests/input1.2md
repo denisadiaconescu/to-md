@@ -1,0 +1,4 @@
+# take all data and make an md table
+
+from [data1.json]
+make md
